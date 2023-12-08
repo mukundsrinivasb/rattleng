@@ -1,0 +1,5 @@
+#After installation , a new environment variable has to be set called "R_LIBS_USER"
+#To make sure that R can access all the libraries . 
+#This R_LIBS_USER has to be a directory with appropriate permission 
+
+R_LIBS_USER = "E:\\rattleng\\r_lib"
