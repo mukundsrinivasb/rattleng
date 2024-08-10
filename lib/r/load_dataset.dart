@@ -1,8 +1,8 @@
 /// Call upon R to load a dataset.
 ///
-/// Time-stamp: <Monday 2023-11-06 13:38:19 +1100 Graham Williams>
+/// Time-stamp: <Sunday 2024-07-21 05:57:18 +1000 Graham Williams>
 ///
-/// Copyright (C) 2023, Togaware Pty Ltd.
+/// Copyright (C) 2023-2024, Togaware Pty Ltd.
 ///
 /// Licensed under the GNU General Public License, Version 3 (the "License");
 ///
@@ -22,29 +22,26 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
-/// Authors: Graham Williams
+/// Authors: Graham Williams, Yixiang Yin
+library;
 
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:rattle/provider/path.dart';
-import 'package:rattle/provider/stdout.dart';
-import 'package:rattle/provider/target.dart';
-import 'package:rattle/provider/vars.dart';
-import 'package:rattle/r/execute.dart';
-import 'package:rattle/r/extract_vars.dart';
+import 'package:rattle/constants/app.dart';
+import 'package:rattle/providers/path.dart';
 import 'package:rattle/r/source.dart';
 
 /// Load the specified dataset using the appropriate R script.
 ///
 /// The R script is expected to load the data into the template variable `ds`,
 /// and define `dsname` as the dataset name and `vnames` as a named list of the
-/// original variable names with values the current variable names, being
+/// original variable names having as values the current variable names, being
 /// different in the case where the dataset variables have been normalised,
 /// which is the default.
 
-void rLoadDataset(WidgetRef ref) {
+void rLoadDataset(BuildContext context, WidgetRef ref) {
   // Get the path from the provider to identify either a filename or a R package
   // dataset.
 
@@ -56,25 +53,52 @@ void rLoadDataset(WidgetRef ref) {
 
   debugPrint("R LOAD DATASET:\t'$path'");
 
-  if (path == '' || path == 'rattle::weather') {
+  if (path == '' || path == weatherDemoFile) {
     // The default, when we get here and no path has been specified yet, is to
     // load the weather dataset as the demo dataset from R's rattle package.
 
-    rSource(ref, "dataset_load_weather");
-  } else if (path.endsWith(".csv")) {
-    rSource(ref, "dataset_load_csv");
+    rSource(context, ref, 'dataset_load_weather');
+  } else if (path.endsWith('.csv')) {
+    rSource(context, ref, 'dataset_load_csv');
+  } else if (path.endsWith('.txt')) {
+    rSource(context, ref, 'dataset_load_txt');
+
+    return;
   } else {
     debugPrint('LOAD_DATASET: PATH NOT RECOGNISED -> ABORT: $path.');
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('PATH NOT RECOGNISED'),
+        content: const Text('Unable to load dataset'),
+        actions: <Widget>[
+          ElevatedButton(
+            child: const Text('OK'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+
     return;
   }
 
   // Reset the dataset variables since we have loaded a new dataset
-//  rattle.resetDataset();
+  //
+  //  rattle.resetDataset();
 
-  rSource(ref, "dataset_prep");
+  rSource(context, ref, 'dataset_prep');
 
-  rExecute(ref, "names(ds)");
+  // 20240615 gjw Move this `names(ds)` command into `dataset_prep` otherwise on
+  // moving to the asset load with async it actually gets executed before the
+  // `dataset_prep` and thus results in vars not being found at this time and
+  // target becomes `found` as in `ds not found`.
 
-  rSource(ref, "ds_glimpse");
+  // rExecute(ref, 'names(ds)');
+
+  // this shows the data
+
+  rSource(context, ref, 'dataset_glimpse');
   debugPrint('R LOAD DATASET:\tLoaded "$path";');
 }

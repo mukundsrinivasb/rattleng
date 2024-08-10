@@ -5,7 +5,7 @@
 # License: GNU General Public License, Version 3 (the "License")
 # https://www.gnu.org/licenses/gpl-3.0.en.html
 #
-# Time-stamp: <Monday 2023-10-16 11:47:03 +1100 Graham Williams>
+# Time-stamp: <Saturday 2024-08-03 14:37:53 +1000 Graham Williams>
 #
 # Licensed under the GNU General Public License, Version 3 (the "License");
 #
@@ -24,8 +24,9 @@
 #
 # Author: Graham Williams
 
-# Run this after the variable `ds` (dataset) has been instantiated.
-# This script will initialise the data template variables.
+# Run this after the variable `ds` (dataset) has been loaded and
+# prep'd or changed in some way, as after a TRANSFORM session.  This
+# script will initialise or update the data template variables.
 #
 # References:
 #
@@ -40,9 +41,9 @@
 
 # Identify variable roles.
 
-target <- "VAR_TARGET"
-risk   <- "VAR_RISK"
-id     <- c(VARS_ID)
+target <- "TARGET_VAR"
+risk   <- "RISK_VAR"
+id     <- c(ID_VARS)
 
 # Record the number of observations.
 
@@ -55,3 +56,57 @@ vars   <- names(ds)
 # Make the target variable the last one.
 
 vars   <- c(target, vars) %>% unique() %>% rev()
+
+# Identify the input variables for modelling.
+
+inputs <- setdiff(vars, target) %T>% print()
+
+# Also record them by indicies.
+
+inputs %>%
+  sapply(function(x) which(x == names(ds)), USE.NAMES=FALSE) %T>%
+  print() ->
+inputi
+
+# Identify the numeric variables by index.
+
+ds %>%
+  sapply(is.numeric) %>%
+  which() %>%
+  intersect(inputi) %T>%
+  print() ->
+numi
+
+# Identify the numeric variables by name.
+
+ds %>% 
+  names() %>% 
+  magrittr::extract(numi) %T>% 
+  print() ->
+numc
+
+# Identify the categoric variables by index.
+
+ds %>%
+  sapply(is.factor) %>%
+  which() %>%
+  intersect(inputi) %T>%
+  print() ->
+cati
+
+# Identify the categoric variables by name.
+
+ds %>% 
+  names() %>% 
+  magrittr::extract(cati) %T>% 
+  print() ->
+catc
+
+# Identify variables by name that have missing values.
+
+missing <- colnames(ds)[colSums(is.na(ds)) > 0]
+
+missing
+
+glimpse(ds)
+summary(ds)

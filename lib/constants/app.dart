@@ -5,7 +5,7 @@
 /// License: https://www.gnu.org/licenses/gpl-3.0.en.html
 ///
 //
-// Time-stamp: <Sunday 2023-10-15 06:41:50 +1100 Graham Williams>
+// Time-stamp: <Friday 2024-08-02 08:58:43 +1000 Graham Williams>
 //
 // Licensed under the GNU General Public License, Version 3 (the "License");
 ///
@@ -24,11 +24,13 @@
 ///
 /// Authors: Graham Williams
 
+library;
+
 import 'package:flutter/material.dart';
 
 /// The Rattle app's title.
 
-const String appTitle = 'Rattle the Next Generation Data Scientist';
+const String appTitle = 'Rattle Next Generation Data Science';
 
 /// Project assets folder path used in the APP.
 
@@ -42,21 +44,12 @@ const String welcomeMsgFile = '$assetsPath/markdown/welcome.md';
 
 const String scriptIntroFile = '$assetsPath/markdown/script_intro.md';
 
-/// The default background colour of the header bar.
-///
-/// A solid purple, suitable for shite text. This stabdout colour is the
-/// backgrounf used throughout the app for buttons, and the like, as well as the
-/// top header bar used for the control area at the top of the app.
+/// File name of demo file (weather.csv).
 
-const headerBarColour = Color(0xff45035e);
+const String weatherDemoFile = 'rattle::weather';
 
-/// The default background colour of the status bar.
-///
-/// A light purple, suitable for black text, is 0x5545035e. This is a soft
-/// contrast to the darker purple used for the control area at the top of the
-/// app.
-
-const statusBarColour = Color(0x5545035e);
+// proportion of window that display panel takes
+// const double displayRatio = 0.75;
 
 /// A mono font used for displaying R script and output.
 

@@ -1,8 +1,8 @@
 /// Shake, rattle, and roll data science.
 ///
-/// Time-stamp: <Saturday 2023-11-04 09:54:45 +1100 Graham Williams>
+/// Time-stamp: <Friday 2024-08-02 12:53:59 +1000 Graham Williams>
 ///
-/// Copyright (C) 2023, Togaware Pty Ltd.
+/// Copyright (C) 2023-2024, Togaware Pty Ltd.
 ///
 /// Licensed under the GNU General Public License, Version 3 (the "License");
 ///
@@ -22,15 +22,24 @@
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
 /// Authors: Graham Williams
+library;
+
+// Group imports by dart, flutter, packages, local. Then alphabetically.
+
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
-import 'package:rattle/rattle_app.dart';
-import 'package:rattle/utils/debug_print_config.dart';
+import 'package:rattle/app.dart';
+import 'package:rattle/constants/temp_dir.dart';
 import 'package:rattle/utils/is_desktop.dart';
+
+// Check if this is a production (--release) version.
+
+const bool isProduction = bool.fromEnvironment('dart.vm.product');
 
 void main() async {
   // The `main` entry point into any dart app.
@@ -38,17 +47,10 @@ void main() async {
   // This is required to be [async] since we use [await] below to initalise the
   // window manager.
 
-  // Use debugPrint() to print trace messages and backtraces in preference to
-  // print(). Use print() for human readable messages to the console for errors,
-  // like login credentials error. The debugPrint() output is then able to be
-  // globally suppressed with the following noop redefinition. We also use an
-  // environment through helper/utils.dart to toggle this externally, often
-  // through a Makefile. 20220512 gjw
+  // In production do not display [debguPrint] messages.
 
-  if (DebugPrintConfig.debugPrint == 'FALSE') {
-    debugPrint = (String? message, {int? wrapWidth}) {
-      null;
-    };
+  if (isProduction) {
+    debugPrint = (String? message, {int? wrapWidth}) {};
   }
 
   // Tune the window manager before runApp() to avoid a lag in the UI. For
@@ -60,25 +62,29 @@ void main() async {
     await windowManager.ensureInitialized();
 
     WindowOptions windowOptions = const WindowOptions(
-      // Setting [alwaysOnTop] here will ensure the app starts on top of other
-      // apps on the desktop so that it is visible. We later turn it of as we
-      // don;t want to force it always on top.
+      // Setting [alwaysOnTop] here will ensure the desktop app starts on top of
+      // other apps on the desktop so that it is visible. We later turn it of as
+      // we don't want to force it always on top.
 
       alwaysOnTop: true,
 
-      // The size is overridden in the first instance by linux/my_application.cc
-      // but setting it here then does have effect when Restarting the app.
+      // We can override the size in the first instance by, for example in
+      // Linux, editting linux/my_application.cc. Setting it here has effect
+      // when Restarting the app whil debugging
 
-      // Windows has 1280x720 by default in windows/runner/main.cpp line 29 so
-      // best not to override it here since under windows the 950x600 is too
-      // small.
+      // Hoever, since Windows has 1280x720 by default in the windows-specific
+      // windows/runner/main.cpp, line 29, it is best not to override it here
+      // since under Windows 950x600 is too small.
 
       // size: Size(950, 600),
 
       // The [title] is used for the window manager's window title.
 
-      title: "RattleNG - Data Science with R",
+      title: 'RattleNG - Data Science with R',
     );
+
+    // The window should be on top now, so show the window, give it focus, and
+    // then turn always on top off.
 
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
@@ -86,6 +92,15 @@ void main() async {
       await windowManager.setAlwaysOnTop(false);
     });
   }
+
+  // Initialise a global temporary directory where generated files, such as
+  // charts, are saved and can be removed on exit from rattleng or on loading a
+  // new dataset. Notice on Windows the path is of the form
+  // `C:\AppDir\Users\...` which is not acceptable by R (which requires `\\`) so
+  // map them to `/` which is accepted by R on Windows.
+
+  final rattleDir = await Directory.systemTemp.createTemp('rattle');
+  tempDir = rattleDir.path.replaceAll(r'\', '/');
 
   // The runApp() function takes the given Widget and makes it the root of the
   // widget tree. Here we wrap the app within RiverPod's ProviderScope() to

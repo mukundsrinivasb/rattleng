@@ -20,17 +20,22 @@
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
 /// Authors: Graham Williams
+library;
 
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:rattle/constants/keys.dart';
-import 'package:rattle/provider/path.dart';
+import 'package:rattle/constants/status.dart';
+import 'package:rattle/features/dataset/popup.dart';
+import 'package:rattle/providers/path.dart';
+import 'package:rattle/r/load_dataset.dart';
+import 'package:rattle/utils/set_status.dart';
 import 'package:rattle/widgets/delayed_tooltip.dart';
 
 class DatasetTextField extends ConsumerWidget {
-  const DatasetTextField({Key? key}) : super(key: key);
+  const DatasetTextField({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -54,9 +59,9 @@ class DatasetTextField extends ConsumerWidget {
       // Use [Expanded] to fill the remainder of the row.
 
       child: DelayedTooltip(
-        message: "You can type the actual path to a file containing\n"
-            "your dataset, perhaps as a CSV file, or the name of a\n"
-            "package dataset, like rattle::wattle.",
+        message: 'You can type the actual path to a file containing\n'
+            'your dataset, perhaps as a CSV file, or the name of a\n'
+            'package dataset, like rattle::wattle.',
         child: TextField(
           // A [TextField] to contain the name of the selected dataset.
 
@@ -67,6 +72,12 @@ class DatasetTextField extends ConsumerWidget {
 
           onChanged: (newPath) {
             ref.watch(pathProvider.notifier).state = newPath;
+          },
+          onSubmitted: (newPath) {
+            rLoadDataset(context, ref);
+            setStatus(ref, statusChooseVariableRoles);
+
+            datasetLoadedUpdate(ref);
           },
 
           // For an empty value we show a helpful message.

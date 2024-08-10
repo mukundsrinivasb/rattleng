@@ -21,35 +21,106 @@
 ///
 /// Authors: Graham Williams
 
+library;
+
+// Group imports by dart, flutter, packages, local. Then alphabetically.
+
 import 'package:flutter/material.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:rattle/features/dataset/popup.dart';
+import 'package:rattle/providers/dataset_loaded.dart';
+import 'package:rattle/utils/reset.dart';
 import 'package:rattle/widgets/delayed_tooltip.dart' show DelayedTooltip;
 
-class DatasetButton extends StatelessWidget {
-  const DatasetButton({Key? key}) : super(key: key);
+class DatasetButton extends ConsumerWidget {
+  const DatasetButton({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ElevatedButton(
       onPressed: () async {
-        _showPopup(context);
+        // WHEN USER CLICKS THE DATASET BUTTON
+        // FIRST SHOW THE WINDOW ASKING IF YOU REALLY WANT TO LOAD A NEW ONE AND THAT WILL CLEAR EVERYTHING IF A DATASET HAS BEEN LOADED
+        // THE POP UP WINDOW HAS YES OR NO BUTTION.
+        // IF YES, CLEAR EVERY STATE IN THE APP AND SHOW POPUP WINDOW
+        // IF NO, DISMISS THE POPUP WINDOW
+        if (ref.read(datasetLoaded)) {
+          showAlertPopup(context, ref, true);
+        } else {
+          _showOptionPopup(context, ref);
+        }
       },
       child: const DelayedTooltip(
-        message: "Click here to have the option to load the data from a file,\n"
-            "including CSV files, or from an R pacakge, or to load \n"
-            "the demo dataset, rattle::weather.",
-        child: Text("Dataset"),
+        message: 'Press here to have the option to load the data from a file, '
+            'including CSV files, or from an R package, or to load '
+            'the demo dataset, rattle::weather.',
+        child: Text('Dataset'),
       ),
     );
   }
+}
 
-  void _showPopup(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return const DatasetPopup();
-      },
-    );
-  }
+void showAlertPopup(
+  BuildContext context,
+  WidgetRef ref,
+  bool loadNewDataset,
+) {
+  // Show Alert Window, Reset after confirmation
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.warning, color: Colors.red),
+            SizedBox(width: 20),
+            Text('Warning'),
+          ],
+        ),
+        content: const Text(
+          'If you load a new dataset, it will reset the app.\nAre you sure?',
+        ),
+        actions: <Widget>[
+          TextButton(
+            style: TextButton.styleFrom(
+              textStyle: Theme.of(context).textTheme.labelLarge,
+            ),
+            child: const Text('No'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            style: TextButton.styleFrom(
+              textStyle: Theme.of(context).textTheme.labelLarge,
+            ),
+            child: const Text('Yes'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              // RESET BEFORE SHOWOPTIONPOPUP BECAUSE THE OTHER WAY AROUND CASUES BUG:
+              // FIRST SET LOAD TO TRUE AND THEN RESET IT TO FALSE
+              // BUT THE DATASET ACTUALLY IS LOADED
+              // AS A CONSEQUENCE THE PREVIOUS RESULT WON'T BE RESET
+              // BECAUSE LOAD INDICATES NO DATASET HAS BEEN LOADED AND THE APP IS FRESH
+              reset(context, ref);
+              if (loadNewDataset) {
+                _showOptionPopup(context, ref);
+              }
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void _showOptionPopup(BuildContext context, WidgetRef ref) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return const DatasetPopup();
+    },
+  );
 }

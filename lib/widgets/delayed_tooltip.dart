@@ -1,6 +1,8 @@
 /// A delayed tooltip to avoid clutter of tooltips.
-///
-/// Copyright (C) 2023, Togaware Pty Ltd.
+//
+// Time-stamp: <Thursday 2024-07-25 11:21:08 +1000 Graham Williams>
+//
+/// Copyright (C) 2023-2024, Togaware Pty Ltd.
 ///
 /// License: https://www.gnu.org/licenses/gpl-3.0.en.html
 ///
@@ -21,27 +23,71 @@
 ///
 /// Authors: Graham Williams
 
+library;
+
 import 'package:flutter/material.dart';
 
-class DelayedTooltip extends StatelessWidget {
-  final Widget child;
-  final String message;
-  final Duration wait;
+import 'package:rattle/utils/word_wrap.dart';
 
-//  const StatusBar({Key? key}) : super(key: key);
+/// A [Tooltip] that is delayed before being displayed.
+
+class DelayedTooltip extends StatelessWidget {
+  /// Identify the required parameters.
 
   const DelayedTooltip({
-    Key? key,
     required this.child,
     required this.message,
+    super.key,
     this.wait = const Duration(seconds: 1),
-  }) : super(key: key);
+  });
+
+  /// The widget to be displayed as the tooltip.
+
+  final Widget child;
+
+  /// the message to be displayed.
+
+  final String message;
+
+  /// How long to delay before displayiung the tooltip.
+
+  final Duration wait;
 
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: message,
+      richMessage: WidgetSpan(
+        alignment: PlaceholderAlignment.baseline,
+        baseline: TextBaseline.alphabetic,
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          constraints: const BoxConstraints(maxWidth: 350),
+          child: Text(
+            // Use the text tidying aspects of [wordWrap] so we can present the
+            // message using triple quotes and formated with space before and
+            // after, which looks a lot nicer in the code. Set the width high to
+            // avoid embedded '\n'.
+            wordWrap(message, width: 1000),
+            style: const TextStyle(
+              fontSize: 18,
+            ),
+          ),
+        ),
+      ),
+      //message: message,
+      // TODO 20240707 gjw THIS exitDuration WORKS ON DESKTOP BUT DOES NOT SEEM
+      // TO HAVE A AFFECT ON ANDROID.
+      showDuration: const Duration(seconds: 5),
       waitDuration: wait,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25),
+        color: const Color(0XFFDFE0FF), //Colors.amber,
+        // gradient:
+        //     const LinearGradient(colors: <Color>[Colors.amber, Colors.red]),
+      ),
+      // textStyle: const TextStyle(
+      //   fontSize: 18,
+      // ),
       child: child,
     );
   }

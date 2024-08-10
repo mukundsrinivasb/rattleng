@@ -1,6 +1,6 @@
 /// A widget to run an interactive, writable, readable R console.
 ///
-/// Time-stamp: <Friday 2024-03-01 08:55:48 +1100 Graham Williams>
+/// Time-stamp: <Friday 2024-08-09 20:09:22 +1000 Graham Williams>
 ///
 /// Copyright (C) 2023, Togaware Pty Ltd.
 ///
@@ -23,19 +23,22 @@
 ///
 /// Authors: Graham Williams
 
+library;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:xterm/xterm.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:rattle/provider/pty.dart';
-import 'package:rattle/provider/terminal.dart';
+import 'package:rattle/providers/pty.dart';
+import 'package:rattle/providers/terminal.dart';
 
 /// Widget to accept R commands and show results.
 
 class RConsole extends ConsumerStatefulWidget {
-  const RConsole({Key? key}) : super(key: key);
+  const RConsole({super.key});
 
   @override
   ConsumerState<RConsole> createState() => _RConsoleState();
@@ -52,35 +55,34 @@ class _RConsoleState extends ConsumerState<RConsole> {
   }
 
   // There is no TerminalThemes for the black on white that I prefer and am
-  // using for the app. However, the black on white does not allow the Console
-  // to stand out as much for the otherwise white on black app. So white on
-  // black might be a good choice afterall. Although this is not being used for
-  // now, keep it in the code by overridding the lint rule.
+  // using for the app. The black on white does not stand out as much as a
+  // Console white on black does. But the black on white is more in line with
+  // the theme of the app.
 
-  static const blackOnWhite = TerminalTheme(
-    cursor: Color(0XFFAEAFAD),
-    selection: Color(0XFFAEAFAD),
-    foreground: Color(0XFF222222),
-    background: Color(0XFFFFFFFF),
-    black: Color(0XFF000000),
-    red: Color(0XFFCD3131),
-    green: Color(0XFF0DBC79),
-    yellow: Color(0XFFE5E510),
-    blue: Color(0XFF2472C8),
-    magenta: Color(0XFFBC3FBC),
-    cyan: Color(0XFF11A8CD),
-    white: Color(0XFFE5E5E5),
-    brightBlack: Color(0XFF666666),
-    brightRed: Color(0XFFF14C4C),
-    brightGreen: Color(0XFF23D18B),
-    brightYellow: Color(0XFFF5F543),
-    brightBlue: Color(0XFF3B8EEA),
-    brightMagenta: Color(0XFFD670D6),
-    brightCyan: Color(0XFF29B8DB),
-    brightWhite: Color(0XFFFFFFFF),
-    searchHitBackground: Color(0XFFFFFF2B),
-    searchHitBackgroundCurrent: Color(0XFF31FF26),
-    searchHitForeground: Color(0XFF000000),
+  final blackOnWhite = TerminalTheme(
+    cursor: const Color(0XFFAEAFAD),
+    selection: const Color(0XFFAEAFAD).withOpacity(0.2),
+    foreground: const Color(0XFF222222),
+    background: const Color(0XFFFFFFFF),
+    black: const Color(0XFF000000),
+    red: const Color(0XFFCD3131),
+    green: const Color(0XFF0DBC79),
+    yellow: const Color(0XFFE5E510),
+    blue: const Color(0XFF2472C8),
+    magenta: const Color(0XFFBC3FBC),
+    cyan: const Color(0XFF11A8CD),
+    white: const Color(0XFFE5E5E5),
+    brightBlack: const Color(0XFF666666),
+    brightRed: const Color(0XFFF14C4C),
+    brightGreen: const Color(0XFF23D18B),
+    brightYellow: const Color(0XFFF5F543),
+    brightBlue: const Color(0XFF3B8EEA),
+    brightMagenta: const Color(0XFFD670D6),
+    brightCyan: const Color(0XFF29B8DB),
+    brightWhite: const Color(0XFFFFFFFF),
+    searchHitBackground: const Color(0XFFFFFF2B),
+    searchHitBackgroundCurrent: const Color(0XFF31FF26),
+    searchHitForeground: const Color(0XFF000000),
   );
 
   @override
@@ -95,8 +97,26 @@ class _RConsoleState extends ConsumerState<RConsole> {
           autofocus: true,
           backgroundOpacity: 1.0,
           padding: const EdgeInsets.all(8.0),
-          textScaleFactor: 1,
-          // 20240301 gjw Not for now. theme: blackOnWhite,
+          textStyle: const TerminalStyle(fontFamily: 'RobotoMono'),
+          theme: blackOnWhite,
+          // 20240809 gjw Attempt to support copy to clipboard on secondary
+          // mouse button.
+          onSecondaryTapDown: (details, offset) async {
+            debugPrint('TapDown');
+            final selection = terminalController.selection;
+            if (selection != null) {
+              final text = terminal.buffer.getText(selection);
+              debugPrint('SELECTION: $text');
+              terminalController.clearSelection();
+              await Clipboard.setData(ClipboardData(text: text));
+            } else {
+              final data = await Clipboard.getData('text/plain');
+              final text = data?.text;
+              if (text != null) {
+                terminal.paste(text);
+              }
+            }
+          },
         ),
       ),
     );

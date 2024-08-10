@@ -1,149 +1,142 @@
 # Rattle the Next Generation Data Scientist
 
-Rattle has been in development and use for more than 15 years as a
-Data Mining and now Data Science toolkit. It is used by educators,
-consultants, and practitioners across industry and government, to turn
-data into knowledge, through machine learning and artificial
-intelligence.
+Rattle has been in development and use for almost 20 years as a Data
+Mining and now Data Science toolkit for the apprentice and practising
+Data Scientist. The open source software and it books and papers have
+been used by educators, consultants, and practitioners across industry
+and government, to turn data into knowledge, through machine learning
+and artificial intelligence.
 
-It is time for a refresh.
+But now, it is time for a refresh. To install the new Rattle visit the
+[Installers](https://github.com/gjwgit/rattleng/tree/dev/installers/README.md).
 
-RattleNG will adhere to the familiar Rattle style presented in the
-Rattle book (https://bit.ly/rattle_data_mining) with a modern user
-interface refresh implemented in **Flutter**. RattleNG will be
-symphathetic to the published Rattle interface.  Don't worry, the
-underlying **R** foundations remain and **Python** is being added to
-the mix.
+RattleNG, available from [github](https://github.com/gjwgit/rattleng),
+remains sympathetic to the original Rattle user interface,
+functionality, and goals, as presented in the
+[Rattle](https://bit.ly/rattle_data_mining) book. However, it brings
+to the community a modern user interface refresh implemented in
+**Flutter**. The underlying **R** foundations remain firmly in place
+and encapsulated within a more readily extensible framework. A new
+edition of the Rattle book will soon be available.
 
-The underlying architecture has undergone quite a change with the
-maturing of our technology over the years. As I introduced in my more
+Over the past 15 years we have also matured in how we deliver data
+science and analytics. RattleNG delivers a new perspective on
+scripting data science in R through templates as introduced in my more
 recent book, *The Essentials of Data Science*
-(https://bit.ly/essentials_data_science), the concept of templates for
+(https://bit.ly/essentials_data_science). The concept of templates for
 data science now provides the foundations for a flexible and
-extensible application in RattleNG. 
+extensible application in RattleNG.
 
-The open access Togaware Desktop Data Mining Survival Guide even more
-recently provides current Rattle and template documentation and is
-available from Togaware (https://datamining.togaware.com).
+You can also review my Desktop Data Mining Survival Guide published
+online by Togaware, available from (https://datamining.togaware.com).
 
-## Current Status Quick Start 2024-03-01
+The detailed coding documentation for our new Flutter/Dart based
+RattleNG is available online from the [Solid Community
+AU](https://solidcommunity.au/docs/rattleng/).
 
-After installing R and the app (either a package or from source, see
-the next sections), start up the app and work through the following
-scenario. 
+The RattleNG rewrite is being lead by Professor Graham Williams (the
+original Rattle author), Chief Scientist of the Software Innovation
+Institute of the Australian National University.  Significant
+contributions have also been made by Yixiang Yin.
 
-Development is happening at a pace so the scenarios will be updated
-regularly.
+## Quick Start and Current Status 2024-07-07
 
-+ Startup the app .
-+ Tap the **Script** tab to see the R code that has already been run.
-+ Tap the **Console** tab to see the R code being run in the R session.
-+ Tap the **Dataset** tab and then the **Dataset** button and then
-  choose **Demo** to load the `rattle::weather` dataset and view the
-  dataset summary.
-+ Notice the toggle buttons to the top right of the tab page:
-  **Normalise** and **Partition**. Hover the mouse to view the
-  tooltips.
-+ Tap the **Model** tab and then the **Tree** radio button (selected
-  by default) and then the **Build** button to build and view a
-  decision tree. Scroll the window to see the whole tree.
+You will need to install R, separate to the  app itself. Visit
+https://www.r-project.org/ for details.
+
+Then install RattleNG for your operating system as detailed in the
+installers
+[README](https://github.com/gjwgit/rattleng/blob/dev/installers/README.md).
+
+Then:
+
++ Start RattleNG.
++ Tap the **Script** tab to see the R code that has been run.
++ Tap the **Console** tab to see the R code being run within an R
+  session. You can even type R commands there to have them run.
++ Tap the **Dataset** tab to return the to the startup screen for
+  RattleNG. Tap the **Dataset** button and then choose **Demo** to
+  load the `rattle::weather` dataset. You can also load your own CSV
+  or TXT file by tapping the **Filename** button instead. The result
+  panel of the page will provide view or summary of the dataset.
++ Tap the right pointing arrow to view the **Roles** page where you
+  can specify the role for each variable. Defaults will have been set.
++ Notice the toggle buttons to the top right of the **Dataset** page:
+  **Cleanse**, **Normalise** and **Partition**. Hover the mouse to
+  view the tooltips.
++ To build an AI model, tap the **Model** tab and then the **Tree**
+  radio button (selected by default) and then the **Build** button to
+  build and view a decision tree from a CSV dataset. Scroll through
+  the pages to the page showing the decision tree, textually and
+  visually.
 + Tap the **Script** tab and scroll the window to view the latest R
   commands run. Then tap the **Export** button to save the full script
   to `script.R` (no options currently to change the name or location
   of the saved script file).
 + From your own command line run `Rscript script.R`
 
-## Installing RattleNG from Pre-Built Packages
+Currently implemented features as of version 6.2.18:
 
-The basic process is to install the [R statistical
-software](https://cloud.r-project.org/), then fire up R to install the
-pre-requisite packages:
++ Dataset
+  + CSV
+  + Demo
+  + Glimpse
+  + Roles
++ Explore
+  + Summary
+  + Visual
+  + Missing
+  + Correlation
+  + Tests
++ Transform
+  + Impute
+  + Rescale
+  + Recode
+  + Cleanup
++ Model
+  + Cluster
+  + Tree
+  + Forest
+  + Word Cloud
++ Console
++ Script
 
-```r
-install.packages(c("rattle", "magrittr", "janitor", "tidyverse"))
-```
+## Building RattleNG from Source
 
-Then you can install the rattleng app from the packages available on
-github or snap or build it yourself from source.
+Ensure you have R installed, as described in the installer
+[README](https://github.com/gjwgit/rattleng/blob/dev/installers/README.md).
 
-Specific OS instructions follow.
+Install Flutter as describe in the [Flutter Install
+Guide](https://docs.flutter.dev/get-started/install). In short, to
+install on Windows, download the flutter sdk, unzip it to your home
+folder, add `C:\Users\<user>\flutter\bin` to the PATH environment
+variable, and in a CMD console run `flutter help`.
 
-### Linux
+*Currently (20230918), on Azure Windows VM, `flutter doctor` just sits
+there!*
 
-+ Install R
-  + Debian/Ubuntu: `wajig install r-recommended`
-+ Install required R packages
-  + `> install.packages(c("rattle", "magrittr", "janitor", "tidyverse"))`
-+ Install RattleNG with `snap install --dangerous rattle.snap`
-
-The *dangerous* refers to side-loading the app from outside of the
-snap store. This will not be required for the snap store version but
-for this development version we are side-loading the package.
-
-### MacOS
-
-Please check back later.
-
-### Windows
-
-+ Download and install R
-  + Visit https://cloud.r-project.org/ and navigate to Windows install
-  + Click on *Download R for Windows*
-  + Open the downloaded file to install R into *C:\Program Files\R*
-  + Add *C:\Program Files\R\bin* to the PATH environment variable
-    + Open *Edit the system environment variables* from Control panel
-	+ Click *Environment Variables...*
-	+ Click the *Path* entry and then *Edit...*
-    + Click *New* and then add *C:\Program Files\R\bin*
-    + Click *OK* a few times to close the windows.
-+ Download https://rattle.togaware.com/rattle.msix
-+ Add the rattle certificate to your store:
-  + Right click the downloaded file in Explorer
-  + Choose *Properties*
-  + Choose the *Digital Signatures* tab. 
-  + Highlight the *Togaware* line
-  + Click *Details*. 
-  + Click *View Certificate...* 
-  + Click *Install Certificate...*
-  + Choose *Local Machine*
-  + Click *Next*
-  + Choose *Place all certificates in the following store*
-  + Click *Browse...*
-  + Select **Trusted Root Certification Authorities**
-  + Click *OK*
-  + Click *Next* and *Finish*.
-  + A popup says **The import was successful**
-+ Open the downloaded `rattle.msix` to install and run rattle
-  + Or in PowerShell: `Add-AppxPackage -Path .\rattle.msix`
-
-## Running RattleNG from Source
-
-Ensure you have R installed, as described above. Also you will need to
-install Flutter.
-
-Then clone the rattleng repository:
+Then clone the [rattleng](https://github.com/gjwgit/rattleng)
+repository:
 
 ```bash
 git clone https://github.com/gjwgit/rattleng
 cd rattleng
-flutter run -d <os>
+flutter run
 ```
 
-Replace `<os>` with `linux`, `macos`, or `windows`.
+Choose your target platform when prompted.
 
-After firing up the rattleng app, check in the Console tab to make
-sure the following packages were loaded:
+After firing up the rattleng app, check in the **Console** tab to make
+sure R is running. You should see some R code and the console is
+waiting at the R prompt:
 
 ```r
-library(rattle)
-library(magrittr)
-library(janitor)
-library(tidyverse)
-glimpse(weather)
+...
+> 
 ```
 
-RattleNG will eventually check for these and prompt if they are not
-available.
+RattleNG will itself eventually check for these and prompt if they are
+not available.
 
 ### Latest Code
 
@@ -166,24 +159,15 @@ is to make them through pull requests on github. You can fork my
 repository, make your changes, and push them back as a pull request to
 my repository where I can review and merge into the main product.
 
-There is plenty to do, and if you have a favourite part of Rattle,
+There is plenty to do, and if you have a favourite feature of Rattle,
 consider either implementing the GUI in Flutter for that component, or
 else write a simple template R script that takes a dataset `ds` and
 any other template parameters (as ``<<PARAMETER>>`` in the script) to
 then do it's stuff! The `<<PARAMETER>>` strings are filled in by the
-Flutter interface. See the growing number of scripts in `assets/scripts/`
+Flutter interface. See the growing number of scripts in
+`assets/scripts/`
 
 Suggested tasks can be found as github issues.
-
-### Install Flutter on Windows
-
-+ Download the flutter sdk
-+ Unzip it to your home folder
-+ Add C:\Users\<user>\flutter\bin to Path
-+ In a CMD console run `flutter help`
-
-Currently (20230918), on Azure Windows VM, `flutter doctor` just sits
-there!
 
 ## Rattle Resources
 
@@ -191,14 +175,13 @@ there!
 
 ## Some RattleNG teasers
 
-### Rattle's 4 Click First AI Model
+### Rattle's 5 Click to Your First AI Model
 
 The traditional Rattle Welcome screen provides an overview of
 Rattle. To build your first model, simply click the **Dataset** button
 to choose **Demo**, which will load the `rattle::weather`
-dataset. Then click the **Model** tab and the **Build** button and
-your first decision tree (an AI model) will be displayed in the text
-window.
+dataset. Then click the **Model** tab and the **Tree** feature to then
+**Build** your first decision tree (an AI model).
 
 ![](assets/screenshots/data_page.png)
 
@@ -218,11 +201,42 @@ using `ggplot` and the `tidyverse`.
 
 ![](assets/screenshots/explore_plot.png)
 
+The traditional missing data plots have been updated:
+
+![](assets/screenshots/explore_missing_vim.png)
+
+The correlation plot removes repeated information from the plot:
+
+![](assets/screenshots/explore_correlation_corrplot.png)
+
+### Summarising Through WordClouds
+
+For a text file we can gain an insight into the document through a
+word cloud.
+
+![](assets/screenshots/explore_wordcloud.png)
+
+### Wrangling the Data
+
+A suite of transformation functions are available in Rattle to map
+variables in different ways. Each transformation will create a new
+variable from the old variable. Here we see `min_temp` being
+transformed using the RECENTER feature and each of the transform
+functions available. The new variables are prefixed with an indicator
+of the type of transformation performed.
+
+![](assets/screenshots/wrangle_recenter.png)
+
 ### Building Models
 
 A decision tree model is one of the most widely built AI models.
 
 ![](assets/screenshots/model_rpart.png)
+
+Visualisations are now built and presented by default, compared to
+Rattle of Old.
+
+![](assets/screenshots/model_rpart_plot.png)
 
 ### The R Console
 
@@ -237,9 +251,9 @@ file.
 
 ### Everything Captured as Scripts
 
-An be assured, the most important of functionalities, the **Script**
-tab's capturing of your interactions remains a key feature of
-Rattle. Indeed, all of your interactions with R through Rattle are
+And be assured, the most important of functionalities, the **Script**
+tab's capturing of your interactions, remains a key feature of
+Rattle. All of your interactions with R through Rattle are
 captured as a documented and nicely formatted script that you can save
 to file and replicate your whole project simply by asking R to run the
 script. It is also he starting point for modifying a script to do

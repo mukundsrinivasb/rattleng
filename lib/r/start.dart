@@ -1,6 +1,6 @@
 /// Initiate the R process and setup capture of its output.
 ///
-/// Time-stamp: <Monday 2023-11-06 07:59:25 +1100 Graham Williams>
+/// Time-stamp: <Friday 2024-08-09 09:14:49 +1000 Graham Williams>
 ///
 /// Copyright (C) 2023, Togaware Pty Ltd.
 ///
@@ -24,22 +24,23 @@
 ///
 /// Authors: Graham Williams
 
+library;
+
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:rattle/provider/pty.dart';
-//import 'package:rattle/provider/stdout.dart';
-//import 'package:rattle/provider/terminal.dart';
+import 'package:rattle/providers/pty.dart';
+//import 'package:rattle/providers/stdout.dart';
+//import 'package:rattle/providers/terminal.dart';
 import 'package:rattle/r/strip_comments.dart';
 import 'package:rattle/utils/update_script.dart';
 
 /// Start up the R process and set up the capture of stderr and stdout.
 
-void rStart(WidgetRef ref) async {
+void rStart(BuildContext context, WidgetRef ref) async {
   // Start up an R process from the command line.
 
   // process = await Process.start('R', ["--no-save"]);
@@ -71,7 +72,14 @@ void rStart(WidgetRef ref) async {
 
   debugPrint("R START:\t\t'main.R'");
 
-  String code = File("assets/r/main.R").readAsStringSync();
+  const asset = 'assets/r/main.R';
+  String code = await DefaultAssetBundle.of(context).loadString(asset);
+
+  // 20240615 gjw Previously the code used File() to access the asset file which
+  // worked fine in development but failed on a deployment. Thus I moved to the
+  // async reading from the asset bundle.
+  //
+  // String code = File('assets/r/main.R').readAsStringSync();
 
   // Populate the <<USER>>. Bit it seems to need to use Firebase. Too much
   // trouble just for the user name.
@@ -85,7 +93,7 @@ void rStart(WidgetRef ref) async {
   // UI state. For example, two widgets could listen to the same provider, but
   // incorrectly receive different states. We resolve that here by delaying the
   // modification by encapsulating it within a `Future(() {...})`.  This will
-  // perform your update after the widget tree is done building. 20231104 gjw
+  // perform the update after the widget tree is done building. 20231104 gjw
 
   Future(() {
     // Add the code to the script.

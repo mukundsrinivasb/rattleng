@@ -1,6 +1,6 @@
 /// A popup with choices for sourcing the dataset.
 ///
-/// Time-stamp: <Sunday 2023-11-05 20:52:34 +1100 Graham Williams>
+/// Time-stamp: <Friday 2024-08-09 20:31:45 +1000 Graham Williams>
 ///
 /// Copyright (C) 2023, Togaware Pty Ltd.
 ///
@@ -24,24 +24,47 @@
 ///
 /// Authors: Graham Williams, Yiming Lu
 
+library;
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:rattle/constants/app.dart';
 import 'package:rattle/constants/status.dart';
 import 'package:rattle/features/dataset/select_file.dart';
-import 'package:rattle/provider/path.dart';
+import 'package:rattle/providers/dataset_loaded.dart';
+import 'package:rattle/providers/path.dart';
 import 'package:rattle/r/load_dataset.dart';
+import 'package:rattle/r/start.dart';
 import 'package:rattle/utils/set_status.dart';
 
 const double heightSpace = 20;
 const double widthSpace = 10;
 
+void datasetLoadedUpdate(WidgetRef ref) {
+  ref.read(datasetLoaded.notifier).state = true;
+}
+
 class DatasetPopup extends ConsumerWidget {
-  const DatasetPopup({Key? key}) : super(key: key);
+  const DatasetPopup({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // 20240809 gjw Delay the rStart() until we begin to load the dataset. This
+    // may solve the Windows zip install issue whereby main.R is not being
+    // loaded on startup yet the remainder of the R code does get loaded. Also,
+    // we load it here rather than in rLoadDataset because at this time the user
+    // is paused looking at the popup to load the dataset and we have time to
+    // squeeze in and async run main.R before we get the `glimpse` missing
+    // error.
+    //
+    // 20240809 gjw Revert for now until find the proper solution.
+    //
+    // 20240809 gjw Moved main.R into dataset_prep.R see if that works.
+
+    // rStart(context, ref);
+
     return AlertDialog(
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -82,15 +105,16 @@ class DatasetPopup extends ConsumerWidget {
                   String path = await datasetSelectFile();
                   if (path.isNotEmpty) {
                     ref.read(pathProvider.notifier).state = path;
-                    rLoadDataset(ref);
+                    if (context.mounted) rLoadDataset(context, ref);
                     setStatus(ref, statusChooseVariableRoles);
+                    datasetLoadedUpdate(ref);
                   }
 
                   // Avoid the "Do not use BuildContexts across async gaps."
                   // warning.
 
                   if (!context.mounted) return;
-                  Navigator.pop(context, "Filename");
+                  Navigator.pop(context, 'Filename');
                 },
                 child: const Text('Filename'),
               ),
@@ -99,12 +123,14 @@ class DatasetPopup extends ConsumerWidget {
 
               const SizedBox(width: widthSpace),
 
-              // PACKAGE
+              // PACKAGE - Remove for now but include once implemented.
 
               ElevatedButton(
                 onPressed: () {
                   // TODO 20231018 gjw datasetSelectPackage();
-                  Navigator.pop(context, "Package");
+                  Navigator.pop(context, 'Package');
+
+                  datasetLoadedUpdate(ref);
                 },
                 child: const Text('Package'),
               ),
@@ -118,10 +144,17 @@ class DatasetPopup extends ConsumerWidget {
               ElevatedButton(
                 onPressed: () {
                   // TODO 20231101 gjw DEFINE setPath()
-                  ref.read(pathProvider.notifier).state = "rattle::weather";
-                  rLoadDataset(ref);
+
+                  ref.read(pathProvider.notifier).state = weatherDemoFile;
+
+                  // TODO 20240714 gjw HOW TO GET THE weather.csv FROM ASSETS
+                  // ref.read(pathProvider.notifier).state =
+                  //     'assets/data/weather.csv';
+                  rLoadDataset(context, ref);
                   setStatus(ref, statusChooseVariableRoles);
-                  Navigator.pop(context, "Demo");
+                  Navigator.pop(context, 'Demo');
+
+                  datasetLoadedUpdate(ref);
                 },
                 child: const Text('Demo'),
               ),
@@ -139,7 +172,7 @@ class DatasetPopup extends ConsumerWidget {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context, "Cancel");
+                  Navigator.pop(context, 'Cancel');
                 },
                 child: const Text('Cancel'),
               ),

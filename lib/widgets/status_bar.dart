@@ -1,6 +1,6 @@
 /// The app's status bar.
 ///
-/// Time-stamp: <Wednesday 2023-11-01 08:41:55 +1100 Graham Williams>
+/// Time-stamp: <Sunday 2024-07-21 17:28:48 +1000 Graham Williams>
 ///
 /// Copyright (C) 2023, Togaware Pty Ltd.
 ///
@@ -23,29 +23,41 @@
 // this program.  If not, see <https://www.gnu.org/licenses/>.
 ///
 /// Authors: Graham Williams
+library;
 
 import 'package:flutter/material.dart';
 
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import 'package:rattle/constants/app.dart';
 import 'package:rattle/constants/keys.dart';
-import 'package:rattle/provider/status.dart';
+import 'package:rattle/providers/path.dart';
+import 'package:rattle/providers/status.dart';
 
 class StatusBar extends ConsumerWidget {
-  const StatusBar({Key? key}) : super(key: key);
+  const StatusBar({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    String path = ref.watch(pathProvider);
+    if (path != '') path = '$path   ';
+
     return Container(
       height: 50,
       padding: const EdgeInsets.only(left: 0),
-      color: statusBarColour,
+      // color: statusBarColor,
       child: Markdown(
         key: statusBarKey,
         selectable: true,
-        data: ref.watch(statusProvider),
+        onTapLink: (text, href, title) {
+          final Uri url = Uri.parse(href ?? '');
+          launchUrl(url);
+        },
+        data: '![](resource:assets/images/favicon_small.png)   '
+            '[togware.com](https://togaware.com)  '
+            '$path'
+            '${ref.watch(statusProvider)}',
         styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)),
       ),
     );

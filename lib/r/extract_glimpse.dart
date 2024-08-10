@@ -1,11 +1,11 @@
 /// Utility to extract the latest glimpse output from R.
 ///
-/// Copyright (C) 2023, Togaware Pty Ltd.
+/// Copyright (C) 2023-2024, Togaware Pty Ltd.
 ///
 /// License: GNU General Public License, Version 3 (the "License")
 /// https://www.gnu.org/licenses/gpl-3.0.en.html
 //
-// Time-stamp: <Saturday 2023-11-04 21:32:33 +1100 Graham Williams>
+// Time-stamp: <Thursday 2024-07-18 08:55:01 +1000 Graham Williams>
 //
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,8 @@
 ///
 /// Authors: Graham Williams
 
+library;
+
 String rExtractGlimpse(String txt) {
   // Split the string into lines.
 
@@ -33,8 +35,13 @@ String rExtractGlimpse(String txt) {
 
   int startIndex = -1;
 
+  // If the dataset is loaded from a CSV file or the demo dataset it will be
+  // summarised by R's `glimpse(ds)` command. For a TXT file we use `cat(ds,
+  // sep = "\n")`. In either case we find the latest instance and return the
+  // output for display in RattleNG.
+
   for (int i = lines.length - 1; i >= 0; i--) {
-    if (lines[i].contains("> glimpse(ds)")) {
+    if (lines[i].contains('> glimpse(ds)') || lines[i].contains('> cat(ds,')) {
       startIndex = i;
       break;
     }
@@ -42,7 +49,7 @@ String rExtractGlimpse(String txt) {
 
   if (startIndex != -1) {
     for (int i = startIndex + 1; i < lines.length; i++) {
-      if (lines[i].startsWith(">")) {
+      if (lines[i].startsWith('>')) {
         // Found the next line starting with '>'. Stop adding lines to the
         // result.
 

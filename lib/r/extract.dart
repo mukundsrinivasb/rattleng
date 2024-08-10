@@ -1,11 +1,11 @@
-/// Utility to extract the latest print(model_rpart) from R.
+/// Utility to extract the latest R command output.
 ///
-/// Copyright (C) 2023, Togaware Pty Ltd.
+/// Copyright (C) 2023-2024, Togaware Pty Ltd.
 ///
 /// License: GNU General Public License, Version 3 (the "License")
 /// https://www.gnu.org/licenses/gpl-3.0.en.html
 //
-// Time-stamp: <Saturday 2023-09-16 07:39:06 +1000 Graham Williams>
+// Time-stamp: <Saturday 2024-08-10 14:39:23 +1000 Graham Williams>
 //
 // This program is free software: you can redistribute it and/or modify it under
 // the terms of the GNU General Public License as published by the Free Software
@@ -22,8 +22,18 @@
 ///
 /// Authors: Graham Williams
 
+library;
+
+import 'remove_windows_chars.dart';
+
 // TODO 20230916 gjw ADD EXTRA PARAMETER AS THE PATTERN TO EXTRACT SINCE ALL
 // THREE SO FAR ARE BASICALLY THE SAME
+
+/// Extract output lines from an R command.
+///
+/// The supplied [txt] is expected to be [stdout] from the R console and [pat]
+/// is usually an R command to search for. Find the most recent instance of the
+/// command and return its output.
 
 String rExtract(String txt, String pat) {
   // Split the string into lines.
@@ -36,6 +46,8 @@ String rExtract(String txt, String pat) {
 
   int startIndex = -1;
 
+  // Starting from the end of the supplied [txt], often being the [stdout] from
+  // the R console, find the most recent instance of [pat]
   for (int i = lines.length - 1; i >= 0; i--) {
     if (lines[i].contains(pat)) {
       startIndex = i;
@@ -45,17 +57,23 @@ String rExtract(String txt, String pat) {
 
   if (startIndex != -1) {
     for (int i = startIndex + 1; i < lines.length; i++) {
-      if (lines[i].startsWith(">")) {
+      if (lines[i].startsWith('>')) {
         // Found the next line starting with '>'. Stop adding lines to the
         // result.
-
         break;
       }
+
       result.add(lines[i]);
     }
   }
 
   // Join the lines.
 
-  return result.join('\n');
+  String content = result.join('\n');
+
+  // Clean the result.
+
+  content = removeWindowsChars(content);
+
+  return content;
 }

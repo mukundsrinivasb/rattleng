@@ -4,6 +4,15 @@
 
 *~
 !lib
+ignore
+script.R
+.Rhistory
+NOTES.md
+
+installers/*.tar.gz
+installers/*-linux.zip
+installers/*-macos.zip
+installers/*-windows.zip
 
 ########################################################################
 # From https://github.com/flutter/flutter/blob/master/.gitignore
