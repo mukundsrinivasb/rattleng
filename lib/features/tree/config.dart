@@ -44,7 +44,7 @@ import 'package:rattle/r/source.dart';
 import 'package:rattle/utils/get_target.dart';
 import 'package:rattle/utils/show_ok.dart';
 import 'package:rattle/widgets/activity_button.dart';
-import 'package:rattle/widgets/custom_choice_chip.dart';
+import 'package:rattle/widgets/choice_chip_tip.dart';
 import 'package:rattle/widgets/number_field.dart';
 
 class TreeModelConfig extends ConsumerStatefulWidget {
@@ -162,6 +162,7 @@ class TreeModelConfigState extends ConsumerState<TreeModelConfig> {
                         ],
                       ),
                     );
+
                     return;
                   }
                   // Require a target variable.
@@ -224,23 +225,19 @@ class TreeModelConfigState extends ConsumerState<TreeModelConfig> {
                 style: normalTextStyle,
               ),
               configLeftSpace,
-              Wrap(
-                spacing: 5.0,
-                children: AlgorithmType.values.map((algorithmType) {
-                  return CustomChoiceChip(
-                    label: algorithmType.displayName,
-                    selectedTransform: selectedAlgorithm.displayName,
-                    onSelected: (bool selected) {
-                      setState(() {
-                        if (selected) {
-                          selectedAlgorithm = algorithmType;
-                          ref.read(treeAlgorithmProvider.notifier).state =
-                              algorithmType;
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
+
+              ChoiceChipTip<AlgorithmType>(
+                options: AlgorithmType.values,
+                getLabel: (AlgorithmType type) => type.displayName,
+                selectedOption: selectedAlgorithm,
+                onSelected: (AlgorithmType? selected) {
+                  setState(() {
+                    if (selected != null) {
+                      selectedAlgorithm = selected;
+                      ref.read(treeAlgorithmProvider.notifier).state = selected;
+                    }
+                  });
+                },
               ),
               configLeftSpace,
 
@@ -370,6 +367,7 @@ class TreeModelConfigState extends ConsumerState<TreeModelConfig> {
     if (doubleValue == null || doubleValue < 0.0000 || doubleValue > 1.0000) {
       return 'Must be between 0.0000 and 1.0000';
     }
+
     return null;
   }
 
@@ -404,7 +402,7 @@ class TreeModelConfigState extends ConsumerState<TreeModelConfig> {
         }
       }
       // Check if the first and last elements are zero (for diagonal zeros).
-      if (parts[0].trim() != '0' || parts[3].trim() != '0') {
+      if (parts.first.trim() != '0' || parts[3].trim() != '0') {
         return 'Loss matrix must have zeros on diagonals (first and last elements)';
       }
     }

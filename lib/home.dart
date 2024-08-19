@@ -1,6 +1,6 @@
 /// The main tabs-based interface for the Rattle app.
 ///
-/// Time-stamp: <Wednesday 2024-08-07 09:48:08 +1000 Graham Williams>
+/// Time-stamp: <Sunday 2024-08-18 09:24:54 +1000 Graham Williams>
 ///
 /// Copyright (C) 2023-2024, Togaware Pty Ltd.
 ///
@@ -52,6 +52,7 @@ import 'package:rattle/tabs/model.dart';
 import 'package:rattle/tabs/script/tab.dart';
 import 'package:rattle/tabs/transform.dart';
 import 'package:rattle/utils/reset.dart';
+import 'package:rattle/utils/show_ok.dart';
 import 'package:rattle/utils/word_wrap.dart';
 import 'package:rattle/widgets/status_bar.dart';
 
@@ -177,7 +178,6 @@ class RattleHomeState extends ConsumerState<RattleHome>
     _tabController.addListener(() {
       // Check if we are leaving the tab, not entering it.
 
-      debugPrint('LEAVING TAB ${_tabController.previousIndex}');
       if (!_tabController.indexIsChanging) {
         // Index 0 is the DATABASE tab.
         // Index 2 is the TRANSFORM tab.
@@ -220,7 +220,8 @@ class RattleHomeState extends ConsumerState<RattleHome>
 
 Author: Graham Williams
 
-Contributions: Tony Nolan, Mukund B Srinivas, Yixiang Yin.
+Contributions: Tony Nolan, Mukund B Srinivas, Kevin Wang, Zheyuan Xu, Yixiang
+Yin, Bo Zhang.
 
   ''';
 
@@ -263,9 +264,23 @@ Contributions: Tony Nolan, Mukund B Srinivas, Yixiang Yin.
               color: Colors.blue,
             ),
             onPressed: () {
-              rExecute(ref, 'view(ds)\n');
+              String path = ref.read(pathProvider);
+              if (path.isEmpty) {
+                showOk(
+                  context: context,
+                  title: 'No Dataset Loaded',
+                  content: '''
+
+                Please choose a dataset to load from the **Dataset** tab. There is
+                not much we can do until we have loaded a dataset.
+
+                ''',
+                );
+              } else {
+                rExecute(ref, 'view(ds)\n');
+              }
             },
-            tooltip: 'Press here to view the current dataset.',
+            tooltip: 'Tap here to view the current dataset.',
           ),
 
           // RESET
@@ -283,7 +298,7 @@ Contributions: Tony Nolan, Mukund B Srinivas, Yixiang Yin.
                 reset(context, ref);
               }
             },
-            tooltip: 'Press here to clear the current project and\n'
+            tooltip: 'Tap here to clear the current project and\n'
                 'so start a new project with a new dataset.',
           ),
 
@@ -337,7 +352,7 @@ Contributions: Tony Nolan, Mukund B Srinivas, Yixiang Yin.
               Icons.info,
               color: Colors.blue,
             ),
-            tooltip: 'Press here to view information about RattleNG and\n'
+            tooltip: 'Tap here to view information about RattleNG and\n'
                 'those who have contributed to the software.',
           ),
         ],
