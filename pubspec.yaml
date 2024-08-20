@@ -18,7 +18,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  file_picker: ^8.0.6
+  file_picker: ^5.5.0
   flutter_gen: ^5.3.1
   flutter_markdown: ^0.7.1
   # flutter_pty: ^0.4.0
@@ -73,10 +73,10 @@ dev_dependencies:
   # a paid service. This fork maintains it's compatibility with the
   # latest flutter.
 
-  dart_code_metrics:
-    git:
-      url: https://github.com/anusii/dart-code-metrics.git
-      ref: dev
+  # dart_code_metrics:
+  #   git:
+  #     url: https://github.com/anusii/dart-code-metrics.git
+  #     ref: dev
 
   # The `flutter_lints` package contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the
